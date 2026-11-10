@@ -1,7 +1,9 @@
-"""Buscas em largura e profundidade, sem bibliotecas de busca prontas."""
+"""Buscas cega e informadas, sem bibliotecas de busca prontas."""
 
 from collections import deque
 from dataclasses import dataclass
+from heapq import heappop, heappush
+from math import hypot
 
 from rede import Rede
 
@@ -70,5 +72,82 @@ def dfs(rede: Rede, origem: int, destino: int) -> ResultadoBusca:
             pais[vizinho] = pilha[-1][0]
             ordem.append(vizinho)
             pilha.append((vizinho, iter(rede.adjacencias[vizinho])))
+
+    return _resultado(rede, pais, ordem, destino)
+
+
+def _heuristica(rede: Rede, destino: int):
+    """Distância euclidiana ao destino: admissível, pois cada peso é euclidiano."""
+    xd, yd = rede.pontos[destino]
+    return lambda v: hypot(rede.pontos[v][0] - xd, rede.pontos[v][1] - yd)
+
+
+def _busca_prioridade(rede: Rede, origem: int, destino: int,
+                      usar_custo: bool, usar_heuristica: bool) -> ResultadoBusca:
+    """Base comum de Best-First (h), A* (g + h) e Dijkstra (g)."""
+    _validar_vertices(rede, origem, destino)
+    h = _heuristica(rede, destino) if usar_heuristica else (lambda _: 0.0)
+    custo = {origem: 0.0}
+    pais: dict[int, int | None] = {origem: None}
+    fechados: set[int] = set()
+    ordem = []
+    # Empates resolvidos pelo índice do vértice, para resultados reproduzíveis.
+    fronteira = [(h(origem), origem)]
+
+    while fronteira:
+        _, atual = heappop(fronteira)
+        if atual in fechados:
+            continue
+        fechados.add(atual)
+        ordem.append(atual)
+        if atual == destino:
+            break
+        for vizinho, peso in rede.adjacencias[atual].items():
+            if vizinho in fechados:
+                continue
+            novo_custo = custo[atual] + peso
+            if usar_custo:
+                if novo_custo >= custo.get(vizinho, float("inf")):
+                    continue
+            elif vizinho in pais:
+                continue
+            custo[vizinho] = novo_custo
+            pais[vizinho] = atual
+            prioridade = h(vizinho) + (novo_custo if usar_custo else 0.0)
+            heappush(fronteira, (prioridade, vizinho))
+
+    return _resultado(rede, pais, ordem, destino)
+
+
+def best_first(rede: Rede, origem: int, destino: int) -> ResultadoBusca:
+    return _busca_prioridade(rede, origem, destino, False, True)
+
+
+def a_estrela(rede: Rede, origem: int, destino: int) -> ResultadoBusca:
+    return _busca_prioridade(rede, origem, destino, True, True)
+
+
+def dijkstra(rede: Rede, origem: int, destino: int) -> ResultadoBusca:
+    return _busca_prioridade(rede, origem, destino, True, False)
+
+
+def hill_climbing(rede: Rede, origem: int, destino: int) -> ResultadoBusca:
+    """Move-se ao vizinho de menor h; para em mínimo local, sem backtracking."""
+    _validar_vertices(rede, origem, destino)
+    h = _heuristica(rede, destino)
+    pais: dict[int, int | None] = {origem: None}
+    ordem = [origem]
+    atual = origem
+
+    while atual != destino:
+        vizinhos = rede.adjacencias[atual]
+        if not vizinhos:
+            break
+        melhor = min(vizinhos, key=lambda v: (h(v), v))
+        if h(melhor) >= h(atual):
+            break
+        pais[melhor] = atual
+        ordem.append(melhor)
+        atual = melhor
 
     return _resultado(rede, pais, ordem, destino)

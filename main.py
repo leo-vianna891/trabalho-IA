@@ -1,10 +1,19 @@
-"""Execução da rede KNN e das buscas já implementadas."""
+"""Execução da rede KNN e das buscas implementadas."""
 
 import argparse
 from time import perf_counter
 
-from buscas import bfs, dfs
+from buscas import a_estrela, best_first, bfs, dfs, dijkstra, hill_climbing
 from rede import gerar_knn
+
+ALGORITMOS = {
+    "bfs": bfs,
+    "dfs": dfs,
+    "best_first": best_first,
+    "a_estrela": a_estrela,
+    "hill_climbing": hill_climbing,
+    "dijkstra": dijkstra,
+}
 
 
 def main() -> None:
@@ -15,8 +24,8 @@ def main() -> None:
     parser.add_argument("--origem", type=int, default=0)
     parser.add_argument("--destino", type=int,
                         help="Índice do destino; padrão: último vértice.")
-    parser.add_argument("--algoritmo", choices=("bfs", "dfs", "ambos"),
-                        default="ambos")
+    parser.add_argument("--algoritmo", choices=(*ALGORITMOS, "todos"),
+                        default="todos")
     args = parser.parse_args()
     destino = args.vertices - 1 if args.destino is None else args.destino
 
@@ -35,11 +44,10 @@ def main() -> None:
     print(f"ORIGEM={args.origem} DESTINO={destino}")
     print(f"TEMPO_GERACAO_S={tempo_geracao:.6f}")
 
-    algoritmos = {"bfs": bfs, "dfs": dfs}
-    selecionados = algoritmos if args.algoritmo == "ambos" else [args.algoritmo]
+    selecionados = ALGORITMOS if args.algoritmo == "todos" else [args.algoritmo]
     for nome in selecionados:
         inicio = perf_counter()
-        resultado = algoritmos[nome](rede, args.origem, destino)
+        resultado = ALGORITMOS[nome](rede, args.origem, destino)
         tempo = perf_counter() - inicio
         print(f"\nALGORITMO={nome.upper()}")
         print(f"VERTICES_EXPLORADOS={len(resultado.ordem_exploracao)}")

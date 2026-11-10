@@ -9,7 +9,7 @@ Requer Python 3.10 ou superior. Não há dependências externas.
 ```sh
 python3 main.py
 python3 main.py --vertices 500 --vizinhos 7 --origem 0 --destino 499 --semente 13
-python3 main.py --vertices 2500 --vizinhos 11 --algoritmo bfs
+python3 main.py --vertices 2500 --vizinhos 11 --algoritmo a_estrela
 ```
 
 No Windows, pode-se substituir `python3` por `py -3` ou `python`, conforme a instalação.
@@ -20,7 +20,8 @@ os tempos de geração e busca. Uma execução isolada não constitui uma média
 ## Arquivos
 
 - `rede.py`: coordenadas, adjacências e geração KNN.
-- `buscas.py`: BFS, DFS e resultado comum com caminho, distância e ordem de exploração.
+- `buscas.py`: BFS, DFS, Best-First, A*, Hill Climbing, Dijkstra e resultado comum
+  com caminho, distância e ordem de exploração.
 - `main.py`: parâmetros e execução pelo terminal.
 - `Trabalho_IA.pdf`: enunciado original.
 
@@ -40,13 +41,18 @@ com o percurso de profundidade equivalente ao recursivo. Ambas usam a ordem de
 inserção das adjacências e não prometem o menor custo geométrico.
 A ordem de exploração inclui o destino quando encontrado; ela não é o caminho solução.
 
+Best-First, A* e Hill Climbing usam como heurística a distância euclidiana ao destino.
+Ela é admissível e consistente, pois cada peso é a distância euclidiana da aresta;
+logo A* retorna o mesmo custo ótimo que Dijkstra. Best-First ordena apenas por h,
+A* por g + h e Dijkstra apenas por g; as três compartilham a mesma fila de prioridade.
+Hill Climbing segue o vizinho de menor h e para quando nenhum vizinho melhora h
+(mínimo local), sem backtracking; nesse caso informa caminho inexistente.
+
 ## Escopo atual
 
-Implementados: geração KNN, BFS e DFS. O gerador calcula as distâncias aos demais
-vértices e seleciona os k menores sem construir uma matriz de distâncias.
+Implementados: geração KNN e os seis algoritmos de busca. O gerador calcula as
+distâncias aos demais vértices e seleciona os k menores sem construir uma matriz de distâncias.
 
-Próximos algoritmos: Best-First, A*, Hill Climbing sem backtracking e Dijkstra
-(para cumprir a comparação pedida no enunciado).
 Visualização, experimentos sistemáticos, relatório e slides ainda não estão implementados.
 
 Sem suíte de testes automatizados, CI/CD ou infraestrutura adicional.
