@@ -1,6 +1,7 @@
 """Execução da rede KNN e das buscas implementadas."""
 
 import argparse
+import sys
 from time import perf_counter
 
 from buscas import a_estrela, best_first, bfs, dfs, dijkstra, hill_climbing
@@ -60,5 +61,20 @@ def main() -> None:
             print("DISTANCIA=INDEFINIDA")
 
 
+def abrir_interface() -> None:
+    try:
+        from interface import executar
+    except ImportError as erro:
+        sys.exit(f"Não foi possível abrir a interface gráfica: {erro}\n"
+                 "Instale o Tk do sistema (Arch: pacman -S tk; "
+                 "Debian/Ubuntu: apt install python3-tk) ou use os "
+                 "argumentos de linha de comando (--help).")
+    executar()
+
+
 if __name__ == "__main__":
-    main()
+    # Sem argumentos abre a interface; com argumentos mantém o modo terminal.
+    if len(sys.argv) == 1:
+        abrir_interface()
+    else:
+        main()

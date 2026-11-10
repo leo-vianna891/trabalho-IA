@@ -4,10 +4,24 @@ Projeto da disciplina de Inteligência Artificial da USP, abordagem A, grupo 13.
 
 ## Executar
 
-Requer Python 3.10 ou superior. Não há dependências externas.
+Requer Python 3.10 ou superior com Tkinter. Não há dependências pip.
+No Linux, o Tk pode precisar ser instalado (Arch: `pacman -S tk`;
+Debian/Ubuntu: `apt install python3-tk`).
+
+Sem argumentos, abre a interface gráfica:
 
 ```sh
 python3 main.py
+```
+
+A interface permite escolher n, k e a semente da rede, sortear origem e destino,
+escolher o algoritmo e a velocidade, e animar a busca. A animação termina ao chegar
+ao destino ou ao clicar em Finalizar. O estado final mostra os vértices e arestas
+explorados em azul e, se o destino foi alcançado, o caminho em vermelho.
+
+Com argumentos, roda no terminal:
+
+```sh
 python3 main.py --vertices 500 --vizinhos 7 --origem 0 --destino 499 --semente 13
 python3 main.py --vertices 2500 --vizinhos 11 --algoritmo a_estrela
 ```
@@ -22,7 +36,8 @@ os tempos de geração e busca. Uma execução isolada não constitui uma média
 - `rede.py`: coordenadas, adjacências e geração KNN.
 - `buscas.py`: BFS, DFS, Best-First, A*, Hill Climbing, Dijkstra e resultado comum
   com caminho, distância e ordem de exploração.
-- `main.py`: parâmetros e execução pelo terminal.
+- `interface.py`: interface gráfica Tkinter com animação das buscas.
+- `main.py`: abre a interface ou executa pelo terminal com argumentos.
 - `Trabalho_IA.pdf`: enunciado original.
 
 ## Convenções da rede
@@ -53,6 +68,6 @@ Hill Climbing segue o vizinho de menor h e para quando nenhum vizinho melhora h
 Implementados: geração KNN e os seis algoritmos de busca. O gerador calcula as
 distâncias aos demais vértices e seleciona os k menores sem construir uma matriz de distâncias.
 
-Visualização, experimentos sistemáticos, relatório e slides ainda não estão implementados.
+Experimentos sistemáticos, relatório e slides ainda não estão implementados.
 
 Sem suíte de testes automatizados, CI/CD ou infraestrutura adicional.

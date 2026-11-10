@@ -13,6 +13,8 @@ class ResultadoBusca:
     caminho: list[int]
     distancia: float | None
     ordem_exploracao: list[int]
+    # Pai de cada vértice alcançado; permite desenhar a árvore de exploração.
+    pais: dict[int, int | None]
 
 
 def _validar_vertices(rede: Rede, origem: int, destino: int) -> None:
@@ -24,7 +26,7 @@ def _validar_vertices(rede: Rede, origem: int, destino: int) -> None:
 def _resultado(rede: Rede, pais: dict[int, int | None],
                ordem: list[int], destino: int) -> ResultadoBusca:
     if destino not in pais:
-        return ResultadoBusca([], None, ordem)
+        return ResultadoBusca([], None, ordem, pais)
 
     caminho = []
     atual: int | None = destino
@@ -34,7 +36,7 @@ def _resultado(rede: Rede, pais: dict[int, int | None],
     caminho.reverse()
     distancia = sum((rede.adjacencias[a][b]
                      for a, b in zip(caminho, caminho[1:])), 0.0)
-    return ResultadoBusca(caminho, distancia, ordem)
+    return ResultadoBusca(caminho, distancia, ordem, pais)
 
 
 def bfs(rede: Rede, origem: int, destino: int) -> ResultadoBusca:
